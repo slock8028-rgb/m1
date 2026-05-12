@@ -1,15 +1,5 @@
 
-window.onerror = function(msg, url, line, col, error) {
-  document.body.innerHTML = `<div style="background: #fee; color: #b00; padding: 2rem; font-family: monospace; border: 5px solid red; margin: 20px;">
-    <h1 style="margin-top:0">🚨 CRITICAL APP CRASH</h1>
-    <p><strong>Message:</strong> ${msg}</p>
-    <p><strong>Line:</strong> ${line}:${col}</p>
-    <p><strong>Error:</strong> ${error}</p>
-    <hr/>
-    <p>This is a diagnostic screen. Please send this text to your developer.</p>
-  </div>`;
-  return true;
-};
+
 
 import React, { useState, useEffect, useRef } from 'react';
 import { 
@@ -130,6 +120,11 @@ const callGeminiImageAPI = async (prompt, base64Image) => {
 
 // --- 主應用程式組件 ---
 export default function App() {
+
+  
+  
+  
+
   const [user, setUser] = useState(null);
   const [userPoints, setUserPoints] = useState(0);
   const [currentPage, setCurrentPage] = useState('home'); // home, create, dashboard, history, pricing
@@ -722,9 +717,9 @@ function HistoryPage({ user }) {
 }
 
 function PricingPage({ updatePoints, onNavigate }) {
-  const [showMockModal, setShowMockModal] = useState(false);
-  const [showAlipayModal, setShowAlipayModal] = useState(false);
-  const [uploadingProof, setUploadingProof] = useState(false);
+  
+  
+  
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
