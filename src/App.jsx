@@ -101,7 +101,7 @@ const callGeminiImageAPI = async (prompt, base64Image) => {
         });
       }
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${API_KEY}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -110,7 +110,10 @@ const callGeminiImageAPI = async (prompt, base64Image) => {
         })
       });
 
-      if (!response.ok) throw new Error(`API Error: ${response.status}`);
+      if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error?.message || `API Error: ${response.status}`);
+    }
       const data = await response.json();
       
       const candidate = data.candidates?.[0];
@@ -429,7 +432,7 @@ function CreateCardPage({ user, points, updatePoints, onNavigate }) {
       setResultImage(generatedImageUrl);
     } catch (err) {
       console.error(err);
-      setErrorMsg('生成失敗，可能遇到網路問題或圖片大小限制。');
+      setErrorMsg(`生成失敗: ${err.message}`);
     } finally {
       setIsGenerating(false);
     }
