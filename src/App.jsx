@@ -1,3 +1,16 @@
+
+window.onerror = function(msg, url, line, col, error) {
+  document.body.innerHTML = `<div style="background: #fee; color: #b00; padding: 2rem; font-family: monospace; border: 5px solid red; margin: 20px;">
+    <h1 style="margin-top:0">🚨 CRITICAL APP CRASH</h1>
+    <p><strong>Message:</strong> ${msg}</p>
+    <p><strong>Line:</strong> ${line}:${col}</p>
+    <p><strong>Error:</strong> ${error}</p>
+    <hr/>
+    <p>This is a diagnostic screen. Please send this text to your developer.</p>
+  </div>`;
+  return true;
+};
+
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Upload, Image as ImageIcon, Sparkles, Gift, Wand2, History, CreditCard, 
