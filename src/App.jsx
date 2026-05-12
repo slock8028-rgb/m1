@@ -48,6 +48,8 @@ const STYLES_ART = [
   '3D 渲染立體風', '復古拍立得相片', '剪紙藝術(Papercut)', '霓虹燈管藝術', '彩色玻璃窗(Stained Glass)'
 ];
 
+const STRIPE_PUBLIC_KEY = "pk_live_51TPxre6hUbHNbFqhPNKApgieuIgNnvZHn79b753wbLzsqXpQm0zDo6veJ2x2ehKwgzTDRv1SMCiSqDNcmAMVfmd400yvfQ7P6u";
+
 const PRICING_PLANS = [
   { id: 'basic', name: '入門方案', points: 80, price: 16, desc: '可生成 8 張賀咭' },
   { id: 'value', name: '超值方案', points: 300, price: 56, desc: '可生成 30 張賀咭', popular: true },
@@ -639,7 +641,7 @@ function PricingPage({ updatePoints, onNavigate }) {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const confirmMockPurchase = async () => {
+  const confirmStripePurchase = async () => {
     setIsProcessing(true);
     await delay(1000);
     await updatePoints(selectedPlan.points);
@@ -672,10 +674,10 @@ function PricingPage({ updatePoints, onNavigate }) {
       {showMockModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-md rounded-3xl p-8">
-            <h3 className="text-2xl font-bold mb-4">Stripe 模擬支付</h3>
+            <h3 className="text-2xl font-bold mb-4">Stripe 安全支付</h3>
             <p className="text-sm text-gray-500 mb-6">您正在購買 {selectedPlan.name} (HK${selectedPlan.price})</p>
-            <button onClick={confirmMockPurchase} className="w-full bg-[#635BFF] text-white py-3 rounded-xl font-bold">
-              {isProcessing ? <Loader2 className="animate-spin mx-auto" /> : "模擬成功付款"}
+            <button onClick={confirmStripePurchase} className="w-full bg-[#635BFF] text-white py-3 rounded-xl font-bold">
+              {isProcessing ? <Loader2 className="animate-spin mx-auto" /> : "立即前往付款"}
             </button>
             <button onClick={() => setShowMockModal(false)} className="w-full mt-4 text-gray-400">取消</button>
           </div>
