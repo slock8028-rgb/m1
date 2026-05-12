@@ -84,48 +84,32 @@ const compressImage = async (base64Str, maxWidth = 800, quality = 0.6) => {
 };
 
 const callGeminiImageAPI = async (prompt, base64Image) => {
-  let attempt = 0;
-  const maxRetries = 5;
-  const retryDelays = [1000, 2000, 4000, 8000, 16000];
+  try {
+    // Pollinations.ai uses a URL-based generation approach.
+    // We'll encode the prompt and request a high-quality image.
+    const encodedPrompt = encodeURIComponent(prompt + " high quality, cinematic lighting, masterpiece, 4k");
+    const seed = Math.floor(Math.random() * 1000000);
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?seed=${seed}&width=1024&height=1024&nologo=true`;
+    
+    // To ensure the image is fully loaded before returning
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = imageUrl;
+    });
 
-  while (attempt < maxRetries) {
-    try {
-      const parts = [{ text: prompt }];
-      if (base64Image) {
-        const cleanBase64 = base64Image.split(',')[1];
-        parts.push({
-          inlineData: {
-            mimeType: "image/png",
-            data: cleanBase64
-          }
-        });
-      }
-
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3:generateContent?key=${API_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts }],
-          generationConfig: { responseModalities: ['IMAGE'] }
-        })
-      });
-
-      if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.error?.message || `API Error: ${response.status}`);
-    }
-      const data = await response.json();
-      
-      const candidate = data.candidates?.[0];
-      const base64Data = candidate?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-      
-      if (!base64Data) throw new Error('No image generated');
-      return `data:image/png;base64,${base64Data}`;
-    } catch (err) {
-      if (attempt === maxRetries - 1) throw err;
-      await delay(retryDelays[attempt]);
-      attempt++;
-    }
+    // Convert the URL to Base64 so the rest of the app's 
+    // compression and Firestore storage logic still works.
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  } catch (err) {
+    throw new Error(`Image Generation Error: ${err.message}`);
   }
 };
 
