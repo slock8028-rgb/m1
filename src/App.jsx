@@ -13,14 +13,21 @@ import {
 } from 'firebase/firestore';
 
 // --- Firebase 初始化 ---
-const firebaseConfig = { apiKey: import.meta.env.VITE_FIREBASE_API_KEY, authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN, projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID, storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET, messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID, appId: import.meta.env.VITE_FIREBASE_APP_ID };
+const firebaseConfig = { 
+  apiKey: "AIzaSyDF_GuKWmk8iCiztIXqBw242e8bmXHaDmE", 
+  authDomain: "blessingcardai.firebaseapp.com", 
+  projectId: "blessingcardai", 
+  storageBucket: "blessingcardai.firebasestorage.app", 
+  messagingSenderId: "1081489694882", 
+  appId: "1:1081489694882:web:57e833a8c0f5151e7d77fb" 
+};
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'blessing-card-ai';
 
 // --- 常數設定 ---
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const API_KEY = "AIzaSyA3csaPKlpK1kgGIq2vqUMz1IzKEYwP3GQ";
 const POINTS_NEW_USER = 20;
 const POINTS_PER_GEN = 10;
 
