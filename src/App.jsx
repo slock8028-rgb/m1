@@ -195,7 +195,79 @@ export default function App() {
   };
 
   if (isLoadingAuth) {
-    return <div className="min-h-screen bg-[#F5F0E6] flex items-center justify-center text-[#5C4033]"><Loader2 className="animate-spin w-10 h-10" /></div>;
+    return <div className="min-h-screen bg-[#F5F0E6] flex items-center justify-center text-[#5C4033]"><Loader2 className="animate-spin w-10 h-10" />
+  {showAlipayModal && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+        <div className="bg-blue-600 p-6 text-white text-center">
+          <h3 className="text-2xl font-bold">AlipayHK 支付</h3>
+          <p className="text-blue-100 text-sm mt-1">請掃描下方二維碼完成付款</p>
+        </div>
+        
+        <div className="p-8 flex flex-col items-center">
+          <div className="bg-white p-4 rounded-2xl shadow-inner border-4 border-blue-50 mb-6">
+            <img src="/alipay-qr.jpg" alt="Alipay QR" className="w-64 h-64 object-contain" />
+          </div>
+          
+          <div className="w-full space-y-4">
+            <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+              <p className="text-blue-800 text-sm font-medium text-center">
+                付款金額: <span className="text-lg font-bold">HK${selectedPlan?.price}</span>
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700 text-center">付款後請上傳截圖證明</label>
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={async (e) => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+                  setUploadingProof(true);
+                  try {
+                    // Upload to Firebase Storage
+                    const storageRef = ref(storage, `payment_proofs/${user.uid}_${Date.now()}`);
+                    await uploadBytes(storageRef, file);
+                    const url = await getDownloadURL(storageRef);
+                    
+                    // Save request to Firestore
+                    await addDoc(collection(db, "payment_requests"), {
+                      userId: user.uid,
+                      planId: selectedPlan.name,
+                      points: selectedPlan.points,
+                      proofUrl: url,
+                      status: "pending",
+                      timestamp: serverTimestamp()
+                    });
+                    
+                    alert("付款證明已提交！管理員核實後將為您增加點數。");
+                    setShowAlipayModal(false);
+                  } catch (err) {
+                    alert("上傳失敗，請稍後再試");
+                  } finally {
+                    setUploadingProof(false);
+                  }
+                }}
+                className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-gray-50 p-4 text-center">
+          <button 
+            onClick={() => setShowAlipayModal(false)}
+            className="text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors"
+          >
+            關閉視窗
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
+
+</div>;
   }
 
   return (
@@ -638,6 +710,8 @@ function HistoryPage({ user }) {
 
 function PricingPage({ updatePoints, onNavigate }) {
   const [showMockModal, setShowMockModal] = useState(false);
+  const [showAlipayModal, setShowAlipayModal] = useState(false);
+  const [uploadingProof, setUploadingProof] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -671,7 +745,79 @@ function PricingPage({ updatePoints, onNavigate }) {
           </div>
         ))}
       </div>
-      {showMockModal && (
+     
+  {showAlipayModal && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+        <div className="bg-blue-600 p-6 text-white text-center">
+          <h3 className="text-2xl font-bold">AlipayHK 支付</h3>
+          <p className="text-blue-100 text-sm mt-1">請掃描下方二維碼完成付款</p>
+        </div>
+        
+        <div className="p-8 flex flex-col items-center">
+          <div className="bg-white p-4 rounded-2xl shadow-inner border-4 border-blue-50 mb-6">
+            <img src="/alipay-qr.jpg" alt="Alipay QR" className="w-64 h-64 object-contain" />
+          </div>
+          
+          <div className="w-full space-y-4">
+            <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+              <p className="text-blue-800 text-sm font-medium text-center">
+                付款金額: <span className="text-lg font-bold">HK${selectedPlan?.price}</span>
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700 text-center">付款後請上傳截圖證明</label>
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={async (e) => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+                  setUploadingProof(true);
+                  try {
+                    // Upload to Firebase Storage
+                    const storageRef = ref(storage, `payment_proofs/${user.uid}_${Date.now()}`);
+                    await uploadBytes(storageRef, file);
+                    const url = await getDownloadURL(storageRef);
+                    
+                    // Save request to Firestore
+                    await addDoc(collection(db, "payment_requests"), {
+                      userId: user.uid,
+                      planId: selectedPlan.name,
+                      points: selectedPlan.points,
+                      proofUrl: url,
+                      status: "pending",
+                      timestamp: serverTimestamp()
+                    });
+                    
+                    alert("付款證明已提交！管理員核實後將為您增加點數。");
+                    setShowAlipayModal(false);
+                  } catch (err) {
+                    alert("上傳失敗，請稍後再試");
+                  } finally {
+                    setUploadingProof(false);
+                  }
+                }}
+                className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-gray-50 p-4 text-center">
+          <button 
+            onClick={() => setShowAlipayModal(false)}
+            className="text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors"
+          >
+            關閉視窗
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {showMockModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-md rounded-3xl p-8">
             <h3 className="text-2xl font-bold mb-4">Stripe 安全支付</h3>
