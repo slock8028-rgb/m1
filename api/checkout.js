@@ -16,7 +16,7 @@ export default async function handler(req, res) {
               name: `BlessingCardAI - ${planId} Plan`,
               description: `Add ${points} points to your account`,
               },
-              unit_amount: price * 100, // Stripe uses cents
+              unit_amount: price * 100,
             },
             quantity: 1,
           },
